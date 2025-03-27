@@ -93,4 +93,9 @@ class WeChatSpider():
 
 if __name__ == "__main__":
     wechat = WeChatSpider()
-    wechat.chat()
+    while True:
+        try:
+            wechat.chat()
+        except Exception as e:
+                print(e)
+                print("出错了")
