@@ -26,15 +26,17 @@ class WeChatSpider():
 
 
     def chat(self):
+        #聊天大窗口
         chatbox = self.wait.until(EC.presence_of_element_located((By.ID, 'com.tencent.mm:id/j8g')))
 
         chatItems=chatbox.find_elements(By.ID, "com.tencent.mm:id/cj1")
-
-        for chatItem in chatItems:
+        i=0
+        while True:
+         for chatItem in chatItems:
             nameButon=chatItem.find_element(By.ID, 'com.tencent.mm:id/kbq')
             txt=nameButon.get_attribute('text')
             print("名字",txt)
-            if txt=="订阅号消息" :
+            if txt=="订阅号消息" or txt=="公众号" :
                 print ("过滤掉订阅号消息")
                 continue
            # 检查特定元素是否存在
@@ -43,17 +45,28 @@ class WeChatSpider():
                 chatItem.find_element(By.ID, 'com.tencent.mm:id/o_u')
                 nameButon.click()   
                 try:
-                    msgList = self.driver.find_elements((By.ID, 'com.tencent.mm:id/bkl'))
-                    for msg in msgList:
-                         msgtxt=msg.get_attribute('text')
-                         print(msgtxt)
-                         self.sendMsg(msgtxt)
-                except Exception:
-                    print(Exception)
+                    # msgList = self.driver.find_elements('com.tencent.mm:id/bkl')
+                    
+                    msgList = self.wait.until( EC.visibility_of_all_elements_located((By.ID, 'com.tencent.mm:id/bkl')))
+                    length=len( msgList)
+                    # for msg in msgList:
+                    #      msgtxt=msg.get_attribute('text')
+                    #      print(msgtxt)
+                    #      self.sendMsg(msgtxt)
+                    lastMsg=msgList[length-1].get_attribute('text')
+                    print(lastMsg)
+                    self.sendMsg(lastMsg)
+                    break
+     
+                except Exception as e:
+                    print(e)
                     print("无消息")
-            except Exception:
+            except Exception as e:
+                # print(e)
                 print("消息已读")
-
+         print("第",i,"轮")
+         i+=1
+         time.sleep(5)
      
 
     def sendMsg(self,msg):
@@ -66,8 +79,16 @@ class WeChatSpider():
 
 
         print('发送消息')
-        tab = self.wait.until(EC.presence_of_element_located((By.ID, 'com.tencent.mm:id/fp'))) 
+        tab = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//android.widget.Button[@text='发送']"))) 
+        time.sleep(0.1)
+        tab.click()
         print('发送成功')
+        
+        print('返回')
+        tab = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//android.widget.ImageView[@content-desc='返回']"))) 
+        time.sleep(0.1)
+        tab.click()
+        print('返回成功')
 
 
 if __name__ == "__main__":
