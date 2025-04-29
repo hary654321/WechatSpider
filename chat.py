@@ -42,7 +42,8 @@ class WeChatSpider():
             nameButon=chatItem.find_element(By.ID, 'com.tencent.mm:id/kbq')
             name=nameButon.get_attribute('text')
             print("名字",name)
-            if name=="订阅号消息" or name=="公众号" :
+            filtered_names = {"订阅号消息", "公众号", "服务通知"}
+            if name in filtered_names:
                 print ("过滤掉订阅号消息")
                 continue
            # 检查特定元素是否存在
@@ -72,7 +73,7 @@ class WeChatSpider():
                 print("消息已读")
          print("第",i,"轮")
          i+=1
-         time.sleep(5)
+         time.sleep(10)
      
 
     def sendMsg(self,name,msg):
@@ -83,7 +84,12 @@ class WeChatSpider():
         anwser=self.chat_client.chat_sync(name,name,msg)
 
         # 输入“你好”
-        input_box.send_keys(anwser)
+        # input_box.send_keys(anwser)
+        
+            # 模拟键盘输入，逐个字符发送
+        for char in anwser:
+            input_box.send_keys(char)
+            time.sleep(0.05)  # 添加短暂的延迟，模拟人类输入速度
 
 
         print('发送消息')
